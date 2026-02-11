@@ -32,6 +32,21 @@ SkillShield is the **first security-scored directory** for AI agent skills. Ever
 - **Full-Text Search** — find skills by name, author, or description
 - **Free CLI Scanner** — audit skills locally before installing
 
+## 📸 Screenshots
+
+<div align="center">
+
+**Dashboard Overview**
+![Dashboard](./screenshot-dashboard.png)
+
+**Hero Section**
+![Hero](./screenshot-hero.png)
+
+**Browse Verified Skills**
+![Browse](./screenshot-browse.png)
+
+</div>
+
 ## 🚀 Quick Start
 
 ### Browse the Directory
