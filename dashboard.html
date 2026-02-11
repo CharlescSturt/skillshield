@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillShield Command Centre</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-card: rgba(30, 41, 59, 0.8);
+      --bg-card-hover: rgba(30, 41, 59, 0.95);
+      --border-color: rgba(94, 234, 212, 0.2);
+      --border-glow: rgba(94, 234, 212, 0.4);
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent-emerald: #10b981;
+      --accent-emerald-glow: rgba(16, 185, 129, 0.3);
+      --accent-amber: #f59e0b;
+      --accent-amber-glow: rgba(245, 158, 11, 0.3);
+      --accent-red: #ef4444;
+      --accent-red-glow: rgba(239, 68, 68, 0.3);
+      --accent-cyan: #06b6d4;
+      --accent-cyan-glow: rgba(6, 182, 212, 0.3);
+      --accent-purple: #8b5cf6;
+      --font-mono: 'SF Mono', Monaco, monospace;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 10px var(--accent-emerald-glow); }
+      50% { box-shadow: 0 0 20px var(--accent-emerald-glow), 0 0 30px var(--accent-emerald-glow); }
+    }
+
+    @keyframes scanline {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(100vh); }
+    }
+
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes loading-bar {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(ellipse at 20% 20%, rgba(6, 182, 212, 0.03) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.03) 0%, transparent 50%),
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(94, 234, 212, 0.01) 2px, rgba(94, 234, 212, 0.01) 4px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .scanline {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+      opacity: 0.3;
+      animation: scanline 8s linear infinite;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 30px;
+      animation: fade-in 0.5s ease;
+    }
+
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 20px;
+      box-shadow: 0 0 20px var(--accent-cyan-glow);
+    }
+
+    .title-group h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--text-primary), var(--accent-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .title-group .subtitle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .timestamp {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .timestamp .live-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--accent-emerald);
+      border-radius: 50%;
+      margin-right: 8px;
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+
+    .health-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .health-status.healthy {
+      border-color: var(--accent-emerald);
+      color: var(--accent-emerald);
+    }
+
+    .health-status.warning {
+      border-color: var(--accent-amber);
+      color: var(--accent-amber);
+    }
+
+    .health-status.critical {
+      border-color: var(--accent-red);
+      color: var(--accent-red);
+    }
+
+    /* Section Headers */
+    .section {
+      margin-bottom: 30px;
+      animation: fade-in 0.6s ease forwards;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+
+    .section-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title::before {
+      content: '';
+      width: 4px;
+      height: 16px;
+      background: var(--accent-cyan);
+      border-radius: 2px;
+    }
+
+    /* Overview Cards */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-glow);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent-cyan), transparent);
+    }
+
+    .stat-card.danger::before {
+      background: linear-gradient(90deg, var(--accent-red), transparent);
+    }
+
+    .stat-card.success::before {
+      background: linear-gradient(90deg, var(--accent-emerald), transparent);
+    }
+
+    .stat-card.warning::before {
+      background: linear-gradient(90deg, var(--accent-amber), transparent);
+    }
+
+    .stat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .stat-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .stat-icon.blue {
+      background: rgba(6, 182, 212, 0.1);
+      color: var(--accent-cyan);
+    }
+
+    .stat-icon.red {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--accent-red);
+    }
+
+    .stat-icon.green {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--accent-emerald);
+    }
+
+    .stat-icon.amber {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--accent-amber);
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      font-family: var(--font-mono);
+    }
+
+    .stat-trend {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+    }
+
+    .stat-trend.positive {
+      color: var(--accent-emerald);
+    }
+
+    .stat-trend.negative {
+      color: var(--accent-red);
+    }
+
+    .sparkline {
+      height: 30px;
+      margin-top: 10px;
+    }
+
+    /* Charts Section */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 20px;
+    }
+
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      backdrop-filter: blur(10px);
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .chart-title {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .chart-toggle {
+      display: flex;
+      gap: 4px;
+      background: var(--bg-secondary);
+      padding: 4px;
+      border-radius: 6px;
+    }
+
+    .chart-toggle button {
+      padding: 6px 12px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .chart-toggle button.active {
+      background: var(--accent-cyan);
+      color: var(--bg-primary);
+    }
+
+    .chart-container {
+      position: relative;
+      height: 250px;
+    }
+
+    /* Marketplace Cards */
+    .marketplace-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .marketplace-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .marketplace-card:hover {
+      border-color: var(--border-glow);
+    }
+
+    .marketplace-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .marketplace-logo {
+      width: 40px;
+      height: 40px;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .marketplace-info h3 {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .marketplace-info .count {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .risk-bar {
+      height: 8px;
+      background: var(--bg-secondary);
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      margin-bottom: 16px;
+    }
+
+    .risk-segment {
+      height: 100%;
+      transition: width 0.5s ease;
+    }
+
+    .risk-segment.critical { background: var(--accent-red); }
+    .risk-segment.high { background: var(--accent-amber); }
+    .risk-segment.medium { background: var(--accent-cyan); }
+    .risk-segment.low { background: var(--accent-emerald); }
+
+    .risk-legend {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+      font-size: 0.75rem;
+    }
+
+    .risk-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-secondary);
+    }
+
+    .risk-legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .marketplace-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .last-scraped {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .btn-rescan {
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid var(--accent-cyan);
+      color: var(--accent-cyan);
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-rescan:hover {
+      background: var(--accent-cyan);
+      color: var(--bg-primary);
+    }
+
+    .btn-rescan:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Logs Section */
+    .logs-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .logs-filter {
+      display: flex;
+      gap: 8px;
+      padding: 16px;
+      border-bottom: 1px solid var(--border-color);
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 6px 14px;
+      background: var(--bg-secondary);
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      border-color: var(--accent-cyan);
+      color: var(--text-primary);
+    }
+
+    .logs-feed {
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 0;
+    }
+
+    .logs-feed::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .logs-feed::-webkit-scrollbar-track {
+      background: var(--bg-secondary);
+    }
+
+    .logs-feed::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 3px;
+    }
+
+    .log-entry {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+      font-size: 0.85rem;
+      transition: background 0.2s;
+    }
+
+    .log-entry:hover {
+      background: rgba(94, 234, 212, 0.03);
+    }
+
+    .log-entry:last-child {
+      border-bottom: none;
+    }
+
+    .log-time {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      min-width: 70px;
+    }
+
+    .log-badge {
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      min-width: 70px;
+      text-align: center;
+    }
+
+    .log-badge.scan {
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--accent-cyan);
+    }
+
+    .log-badge.error {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--accent-red);
+    }
+
+    .log-badge.deploy {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-emerald);
+    }
+
+    .log-badge.info {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent-amber);
+    }
+
+    .log-message {
+      flex: 1;
+      color: var(--text-primary);
+    }
+
+    .log-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    /* Tables */
+    .table-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table th {
+      background: var(--bg-secondary);
+      padding: 14px 16px;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.2s;
+    }
+
+    .data-table th:hover {
+      color: var(--text-primary);
+    }
+
+    .data-table th .sort-indicator {
+      margin-left: 6px;
+      opacity: 0.5;
+    }
+
+    .data-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+      font-size: 0.9rem;
+    }
+
+    .data-table tr:hover td {
+      background: rgba(94, 234, 212, 0.03);
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .skill-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .skill-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+
+    .skill-info h4 {
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+
+    .skill-info .author {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .score-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .score-badge.critical {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--accent-red);
+    }
+
+    .score-badge.high {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent-amber);
+    }
+
+    .score-badge.medium {
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--accent-cyan);
+    }
+
+    .score-badge.low {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-emerald);
+    }
+
+    .risk-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .risk-label::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .risk-label.critical {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--accent-red);
+    }
+
+    .risk-label.critical::before {
+      background: var(--accent-red);
+      box-shadow: 0 0 6px var(--accent-red);
+    }
+
+    .risk-label.high {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--accent-amber);
+    }
+
+    .risk-label.high::before {
+      background: var(--accent-amber);
+    }
+
+    .risk-label.medium {
+      background: rgba(6, 182, 212, 0.1);
+      color: var(--accent-cyan);
+    }
+
+    .risk-label.medium::before {
+      background: var(--accent-cyan);
+    }
+
+    .risk-label.low {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--accent-emerald);
+    }
+
+    .risk-label.low::before {
+      background: var(--accent-emerald);
+    }
+
+    .btn-view {
+      padding: 6px 14px;
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-view:hover {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+
+    .issue-count {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    /* Loading State */
+    .loading-skeleton {
+      background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-card) 50%, var(--bg-secondary) 75%);
+      background-size: 200% 100%;
+      animation: loading-bar 1.5s infinite;
+      border-radius: 4px;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    /* Error State */
+    .error-state {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid var(--accent-red);
+      border-radius: 8px;
+      padding: 16px;
+      color: var(--accent-red);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+      }
+
+      .header-right {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .overview-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .marketplace-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .data-table {
+        font-size: 0.8rem;
+      }
+
+      .data-table th, .data-table td {
+        padding: 10px 12px;
+      }
+
+      .log-entry {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .log-message {
+        width: 100%;
+        order: 3;
+      }
+    }
+
+    /* Animations for sections */
+    .section:nth-child(2) { animation-delay: 0.1s; }
+    .section:nth-child(3) { animation-delay: 0.2s; }
+    .section:nth-child(4) { animation-delay: 0.3s; }
+    .section:nth-child(5) { animation-delay: 0.4s; }
+    .section:nth-child(6) { animation-delay: 0.5s; }
+  </style>
+</head>
+<body>
+  <div class="scanline"></div>
+  
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo-section">
+        <div class="logo">🛡️</div>
+        <div class="title-group">
+          <h1>Command Centre</h1>
+          <div class="subtitle">SkillShield Security Dashboard</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="timestamp">
+          <span class="live-indicator"></span>
+          <span id="last-updated">Updating...</span>
+        </div>
+        <div class="health-status healthy" id="health-status">
+          <span>●</span> System Healthy
+        </div>
+      </div>
+    </header>
+
+    <!-- Section 1: Overview Cards -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Overview</h2>
+      </div>
+      <div class="overview-grid">
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-label">Total Skills Scanned</span>
+            <div class="stat-icon blue">🔍</div>
+          </div>
+          <div class="stat-value" id="total-skills">-</div>
+          <div class="stat-trend positive">
+            <span>↑</span>
+            <span id="skills-trend">Loading...</span>
+          </div>
+        </div>
+
+        <div class="stat-card danger">
+          <div class="stat-header">
+            <span class="stat-label">Malicious Blocked</span>
+            <div class="stat-icon red">🚫</div>
+          </div>
+          <div class="stat-value" id="malicious-blocked">-</div>
+          <div class="stat-trend" id="malicious-trend">
+            <span>High + Critical risks</span>
+          </div>
+        </div>
+
+        <div class="stat-card success">
+          <div class="stat-header">
+            <span class="stat-label">Site Views (24h)</span>
+            <div class="stat-icon green">👁</div>
+          </div>
+          <div class="stat-value" id="site-views">-</div>
+          <div class="sparkline">
+            <canvas id="views-sparkline" height="30"></canvas>
+          </div>
+        </div>
+
+        <div class="stat-card warning">
+          <div class="stat-header">
+            <span class="stat-label">Scan Health</span>
+            <div class="stat-icon amber">⚡</div>
+          </div>
+          <div class="stat-value" style="font-size: 1.5rem;" id="scan-status">-</div>
+          <div class="stat-trend" id="last-scan-time">
+            <span>Last scan: --</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Analytics Charts -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Analytics</h2>
+      </div>
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3 class="chart-title">Page Views Over Time</h3>
+            <div class="chart-toggle">
+              <button class="active" onclick="toggleTimeRange('7d', this)">7D</button>
+              <button onclick="toggleTimeRange('30d', this)">30D</button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="views-chart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3 class="chart-title">Risk Distribution</h3>
+          </div>
+          <div class="chart-container">
+            <canvas id="risk-chart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Marketplace Breakdown -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Marketplace Breakdown</h2>
+      </div>
+      <div class="marketplace-grid" id="marketplace-container">
+        <!-- Dynamically populated -->
+      </div>
+    </section>
+
+    <!-- Section 4: Recent Activity / Logs -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Recent Activity</h2>
+      </div>
+      <div class="logs-container">
+        <div class="logs-filter">
+          <button class="filter-btn active" onclick="filterLogs('all', this)">All</button>
+          <button class="filter-btn" onclick="filterLogs('scan', this)">Scans</button>
+          <button class="filter-btn" onclick="filterLogs('error', this)">Errors</button>
+          <button class="filter-btn" onclick="filterLogs('deploy', this)">Deploys</button>
+        </div>
+        <div class="logs-feed" id="logs-feed">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Top Searches -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Top Searches</h2>
+      </div>
+      <div class="table-container">
+        <table class="data-table" id="searches-table">
+          <thead>
+            <tr>
+              <th onclick="sortTable('searches-table', 0)">Search Query <span class="sort-indicator">↕</span></th>
+              <th onclick="sortTable('searches-table', 1)">Times Searched <span class="sort-indicator">↕</span></th>
+              <th onclick="sortTable('searches-table', 2)">Results Found <span class="sort-indicator">↕</span></th>
+            </tr>
+          </thead>
+          <tbody id="searches-tbody">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 6: Flagged Skills -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Flagged Skills</h2>
+      </div>
+      <div class="table-container">
+        <table class="data-table" id="flagged-table">
+          <thead>
+            <tr>
+              <th onclick="sortTable('flagged-table', 0)">Skill <span class="sort-indicator">↕</span></th>
+              <th onclick="sortTable('flagged-table', 1)">Source <span class="sort-indicator">↕</span></th>
+              <th onclick="sortTable('flagged-table', 2)">Score <span class="sort-indicator">↕</span></th>
+              <th onclick="sortTable('flagged-table', 3)">Risk Level <span class="sort-indicator">↕</span></th>
+              <th onclick="sortTable('flagged-table', 4)">Issues <span class="sort-indicator">↕</span></th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="flagged-tbody">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // ==================== CONFIGURATION ====================
+    const API_BASE = 'https://skillshield-api.charlessturt1795.workers.dev/api';
+    const REFRESH_INTERVAL = 60000; // 60 seconds
+
+    // ==================== STATE ====================
+    let currentLogFilter = 'all';
+    let charts = {};
+    let refreshTimer = null;
+
+    // ==================== API FUNCTIONS ====================
+    async function fetchAPI(endpoint) {
+      try {
+        const response = await fetch(`${API_BASE}${endpoint}`);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return await response.json();
+      } catch (error) {
+        console.error(`API Error (${endpoint}):`, error);
+        return null;
+      }
+    }
+
+    // ==================== MOCK DATA (Fallback) ====================
+    const mockData = {
+      skills: {
+        total: 15432,
+        trend: '+12%',
+        byRisk: { critical: 234, high: 892, medium: 3421, low: 10885 },
+        bySource: {
+          'Alexa': { total: 5234, critical: 89, high: 312, medium: 1234, low: 3599, lastScraped: '2026-02-06T12:30:00Z' },
+          'Actions on Google': { total: 4891, critical: 67, high: 289, medium: 1098, low: 3437, lastScraped: '2026-02-06T11:45:00Z' },
+          'SmartThings': { total: 5307, critical: 78, high: 291, medium: 1089, low: 3849, lastScraped: '2026-02-06T10:20:00Z' }
+        }
+      },
+      views: {
+        '24h': 12543,
+        trend: [8234, 9123, 8756, 9456, 10234, 11567, 12543],
+        '7d': {
+          labels: ['Feb 1', 'Feb 2', 'Feb 3', 'Feb 4', 'Feb 5', 'Feb 6', 'Today'],
+          data: [8234, 9123, 8756, 9456, 10234, 11567, 12543]
+        },
+        '30d': {
+          labels: Array.from({length: 30}, (_, i) => `Day ${i+1}`),
+          data: Array.from({length: 30}, () => Math.floor(Math.random() * 5000) + 7000)
+        }
+      },
+      health: {
+        status: 'healthy',
+        lastScan: '2026-02-06T12:30:00Z',
+        responseTime: '124ms'
+      },
+      logs: [
+        { time: '13:22:15', type: 'scan', message: 'Completed scan of Alexa marketplace', meta: '5,234 skills' },
+        { time: '13:18:42', type: 'info', message: 'New HIGH risk skill detected: "Bank Login Helper"', meta: 'Score: 87/100' },
+        { time: '13:15:03', type: 'scan', message: 'Started scheduled scan of Actions on Google', meta: 'Queue: 4,891' },
+        { time: '13:10:27', type: 'deploy', message: 'Dashboard v2.1.0 deployed successfully', meta: 'Build #1247' },
+        { time: '13:05:19', type: 'error', message: 'Connection timeout to SmartThings API', meta: 'Retrying...' },
+        { time: '12:58:44', type: 'scan', message: 'Completed scan of SmartThings marketplace', meta: '5,307 skills' },
+        { time: '12:45:12', type: 'info', message: 'Daily analytics report generated', meta: '125.4 MB' },
+        { time: '12:30:00', type: 'scan', message: 'Auto-scan completed for all marketplaces', meta: 'Duration: 4m 32s' },
+        { time: '12:15:33', type: 'error', message: 'Database connection pool exhausted', meta: 'Resolved' },
+        { time: '11:58:21', type: 'deploy', message: 'Security patches applied', meta: 'CVE-2026-001' }
+      ],
+      searches: [
+        { query: 'bank login', count: 1243, results: 5 },
+        { query: 'password manager', count: 987, results: 12 },
+        { query: 'email verify', count: 856, results: 23 },
+        { query: 'sms sender', count: 743, results: 45 },
+        { query: 'call blocker', count: 654, results: 67 },
+        { query: 'weather', count: 543, results: 234 },
+        { query: 'shopping list', count: 432, results: 89 },
+        { query: 'timer', count: 321, results: 156 }
+      ],
+      flagged: [
+        { name: 'Bank Login Helper', author: 'FinanceTools', source: 'Alexa', score: 94, risk: 'CRITICAL', issues: 7 },
+        { name: 'Password Stealer Pro', author: 'SecurityTest', source: 'Actions on Google', score: 91, risk: 'CRITICAL', issues: 9 },
+        { name: 'SMS Forwarder', author: 'CommTools', source: 'SmartThings', score: 88, risk: 'HIGH', issues: 5 },
+        { name: 'Email Harvester', author: 'MarketingBot', source: 'Alexa', score: 86, risk: 'HIGH', issues: 6 },
+        { name: 'Keylogger Test', author: 'SecurityResearch', source: 'Actions on Google', score: 82, risk: 'HIGH', issues: 8 },
+        { name: 'Call Recorder X', author: 'SpyTools', source: 'SmartThings', score: 79, risk: 'HIGH', issues: 4 },
+        { name: 'Location Tracker', author: 'FamilySafe', source: 'Alexa', score: 76, risk: 'HIGH', issues: 3 },
+        { name: 'Contact Exporter', author: 'BackupPro', source: 'Actions on Google', score: 73, risk: 'MEDIUM', issues: 5 }
+      ]
+    };
+
+    // ==================== UI UPDATE FUNCTIONS ====================
+    function updateTimestamp() {
+      const now = new Date();
+      document.getElementById('last-updated').textContent = now.toLocaleTimeString();
+    }
+
+    function updateHealthStatus(status) {
+      const el = document.getElementById('health-status');
+      const statusMap = {
+        'healthy': { class: 'healthy', text: 'System Healthy' },
+        'degraded': { class: 'warning', text: 'Degraded' },
+        'down': { class: 'critical', text: 'System Down' }
+      };
+      const info = statusMap[status] || statusMap['healthy'];
+      el.className = `health-status ${info.class}`;
+      el.innerHTML = `<span>●</span> ${info.text}`;
+    }
+
+    function formatNumber(num) {
+      if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+      return num.toString();
+    }
+
+    function formatTimeAgo(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diff = Math.floor((now - date) / 1000);
+      
+      if (diff < 60) return 'Just now';
+      if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+      if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+      return `${Math.floor(diff / 86400)}d ago`;
+    }
+
+    // ==================== OVERVIEW CARDS ====================
+    async function loadOverview() {
+      const stats = await fetchAPI('/skills/stats') || mockData.skills;
+      const health = await fetchAPI('/health/scans') || mockData.health;
+      const views = await fetchAPI('/analytics/views') || mockData.views;
+
+      // Total Skills
+      document.getElementById('total-skills').textContent = formatNumber(stats.total);
+      document.getElementById('skills-trend').textContent = stats.trend || '+12%';
+
+      // Malicious Blocked
+      const malicious = (stats.byRisk?.critical || 0) + (stats.byRisk?.high || 0);
+      document.getElementById('malicious-blocked').textContent = formatNumber(malicious);
+
+      // Site Views
+      document.getElementById('site-views').textContent = formatNumber(views['24h'] || 12543);
+
+      // Scan Health
+      document.getElementById('scan-status').textContent = 
+        health.status ? health.status.charAt(0).toUpperCase() + health.status.slice(1) : 'Healthy';
+      document.getElementById('last-scan-time').innerHTML = 
+        `<span>Last scan: ${formatTimeAgo(health.lastScan || Date.now())}</span>`;
+
+      updateHealthStatus(health.status || 'healthy');
+
+      // Sparkline
+      renderSparkline(views.trend || mockData.views.trend);
+    }
+
+    function renderSparkline(data) {
+      const canvas = document.getElementById('views-sparkline');
+      if (!canvas) return;
+      
+      const ctx = canvas.getContext('2d');
+      const width = canvas.offsetWidth;
+      const height = canvas.offsetHeight;
+      canvas.width = width;
+      canvas.height = height;
+
+      const max = Math.max(...data);
+      const min = Math.min(...data);
+      const range = max - min || 1;
+
+      ctx.clearRect(0, 0, width, height);
+      ctx.beginPath();
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 2;
+
+      data.forEach((value, i) => {
+        const x = (i / (data.length - 1)) * width;
+        const y = height - ((value - min) / range) * (height - 4) - 2;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+
+      ctx.stroke();
+
+      // Gradient fill
+      ctx.lineTo(width, height);
+      ctx.lineTo(0, height);
+      ctx.closePath();
+      const gradient = ctx.createLinearGradient(0, 0, 0, height);
+      gradient.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
+      gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+      ctx.fillStyle = gradient;
+      ctx.fill();
+    }
+
+    // ==================== CHARTS ====================
+    function initCharts() {
+      Chart.defaults.color = '#94a3b8';
+      Chart.defaults.borderColor = 'rgba(148, 163, 184, 0.1)';
+      
+      // Views Chart
+      const viewsCtx = document.getElementById('views-chart').getContext('2d');
+      charts.views = new Chart(viewsCtx, {
+        type: 'line',
+        data: {
+          labels: mockData.views['7d'].labels,
+          datasets: [{
+            label: 'Page Views',
+            data: mockData.views['7d'].data,
+            borderColor: '#06b6d4',
+            backgroundColor: 'rgba(6, 182, 212, 0.1)',
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#06b6d4',
+            pointBorderColor: '#0f172a',
+            pointBorderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(148, 163, 184, 0.05)' }
+            },
+            x: {
+              grid: { display: false }
+            }
+          }
+        }
+      });
+
+      // Risk Chart
+      const riskCtx = document.getElementById('risk-chart').getContext('2d');
+      charts.risk = new Chart(riskCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'],
+          datasets: [{
+            data: [234, 892, 3421, 10885],
+            backgroundColor: ['#ef4444', '#f59e0b', '#06b6d4', '#10b981'],
+            borderWidth: 0,
+            hoverOffset: 10
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '65%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                padding: 20,
+                usePointStyle: true
+              }
+            }
+          }
+        }
+      });
+    }
+
+    async function updateCharts(timeRange = '7d') {
+      const stats = await fetchAPI('/skills/stats') || mockData.skills;
+      const views = await fetchAPI('/analytics/views') || mockData.views;
+
+      // Update Views Chart
+      const labels = timeRange === '7d' ? mockData.views['7d'].labels : mockData.views['30d'].labels;
+      const data = timeRange === '7d' ? mockData.views['7d'].data : mockData.views['30d'].data;
+      
+      charts.views.data.labels = labels;
+      charts.views.data.datasets[0].data = data;
+      charts.views.update();
+
+      // Update Risk Chart
+      const riskData = stats.byRisk || mockData.skills.byRisk;
+      charts.risk.data.datasets[0].data = [
+        riskData.critical,
+        riskData.high,
+        riskData.medium,
+        riskData.low
+      ];
+      charts.risk.update();
+    }
+
+    function toggleTimeRange(range, btn) {
+      document.querySelectorAll('.chart-toggle button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updateCharts(range);
+    }
+
+    // ==================== MARKETPLACE ====================
+    async function loadMarketplace() {
+      const stats = await fetchAPI('/skills/stats') || mockData.skills;
+      const bySource = stats.bySource || mockData.skills.bySource;
+      
+      const container = document.getElementById('marketplace-container');
+      container.innerHTML = '';
+
+      Object.entries(bySource).forEach(([source, data]) => {
+        const total = data.total || (data.critical + data.high + data.medium + data.low);
+        const card = document.createElement('div');
+        card.className = 'marketplace-card';
+        card.innerHTML = `
+          <div class="marketplace-header">
+            <div class="marketplace-logo">${getMarketplaceIcon(source)}</div>
+            <div class="marketplace-info">
+              <h3>${source}</h3>
+              <div class="count">${formatNumber(total)} skills indexed</div>
+            </div>
+          </div>
+          <div class="risk-bar">
+            <div class="risk-segment critical" style="width: ${(data.critical / total * 100).toFixed(1)}%"></div>
+            <div class="risk-segment high" style="width: ${(data.high / total * 100).toFixed(1)}%"></div>
+            <div class="risk-segment medium" style="width: ${(data.medium / total * 100).toFixed(1)}%"></div>
+            <div class="risk-segment low" style="width: ${(data.low / total * 100).toFixed(1)}%"></div>
+          </div>
+          <div class="risk-legend">
+            <div class="risk-legend-item"><div class="risk-legend-dot" style="background: var(--accent-red)"></div>${data.critical} CRITICAL</div>
+            <div class="risk-legend-item"><div class="risk-legend-dot" style="background: var(--accent-amber)"></div>${data.high} HIGH</div>
+            <div class="risk-legend-item"><div class="risk-legend-dot" style="background: var(--accent-cyan)"></div>${data.medium} MEDIUM</div>
+            <div class="risk-legend-item"><div class="risk-legend-dot" style="background: var(--accent-emerald)"></div>${data.low} LOW</div>
+          </div>
+          <div class="marketplace-footer">
+            <span class="last-scraped">Last scraped: ${formatTimeAgo(data.lastScraped)}</span>
+            <button class="btn-rescan" onclick="triggerRescan('${source}', this)">
+              <span>↻</span> Rescan
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function getMarketplaceIcon(source) {
+      const icons = {
+        'Alexa': '🔷',
+        'Actions on Google': '🔶',
+        'SmartThings': '⬡'
+      };
+      return icons[source] || '📦';
+    }
+
+    async function triggerRescan(source, btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner">⟳</span> Scanning...';
+      
+      const result = await fetchAPI('/scans/trigger');
+      
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.innerHTML = '<span>✓</span> Done';
+        setTimeout(() => {
+          btn.innerHTML = '<span>↻</span> Rescan';
+        }, 2000);
+      }, 2000);
+    }
+
+    // ==================== LOGS ====================
+    async function loadLogs() {
+      const logs = await fetchAPI('/logs/events') || mockData.logs;
+      renderLogs(logs);
+    }
+
+    function renderLogs(logs) {
+      const container = document.getElementById('logs-feed');
+      container.innerHTML = '';
+
+      const filtered = currentLogFilter === 'all' 
+        ? logs 
+        : logs.filter(l => l.type === currentLogFilter);
+
+      filtered.forEach(log => {
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        entry.innerHTML = `
+          <span class="log-time">${log.time || new Date().toLocaleTimeString()}</span>
+          <span class="log-badge ${log.type}">${log.type}</span>
+          <span class="log-message">${log.message}</span>
+          ${log.meta ? `<span class="log-meta">${log.meta}</span>` : ''}
+        `;
+        container.appendChild(entry);
+      });
+    }
+
+    function filterLogs(type, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentLogFilter = type;
+      loadLogs();
+    }
+
+    // ==================== SEARCHES ====================
+    async function loadSearches() {
+      const searches = await fetchAPI('/analytics/searches') || mockData.searches;
+      const tbody = document.getElementById('searches-tbody');
+      tbody.innerHTML = '';
+
+      searches.forEach(search => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td><strong>${search.query}</strong></td>
+          <td>${formatNumber(search.count)}</td>
+          <td>${search.results}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // ==================== FLAGGED SKILLS ====================
+    async function loadFlagged() {
+      const skills = await fetchAPI('/skills?risk=high,critical&limit=20') || { skills: mockData.flagged };
+      const tbody = document.getElementById('flagged-tbody');
+      tbody.innerHTML = '';
+
+      const flaggedSkills = skills.skills || skills;
+
+      flaggedSkills.forEach(skill => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>
+            <div class="skill-cell">
+              <div class="skill-icon">📦</div>
+              <div class="skill-info">
+                <h4>${skill.name}</h4>
+                <div class="author">by ${skill.author}</div>
+              </div>
+            </div>
+          </td>
+          <td>${skill.source}</td>
+          <td><span class="score-badge ${skill.risk.toLowerCase()}">${skill.score}/100</span></td>
+          <td><span class="risk-label ${skill.risk.toLowerCase()}">${skill.risk}</span></td>
+          <td class="issue-count">${skill.issues} issues</td>
+          <td><button class="btn-view" onclick="viewSkill('${skill.name}')">View Details</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function viewSkill(name) {
+      alert(`Viewing details for: ${name}\n\nThis would open a detailed skill view modal or page.`);
+    }
+
+    // ==================== TABLE SORTING ====================
+    function sortTable(tableId, colIndex) {
+      const table = document.getElementById(tableId);
+      const tbody = table.querySelector('tbody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      
+      const isNumeric = !isNaN(parseFloat(rows[0].cells[colIndex].textContent));
+      
+      rows.sort((a, b) => {
+        let aVal = a.cells[colIndex].textContent.trim();
+        let bVal = b.cells[colIndex].textContent.trim();
+        
+        if (isNumeric) {
+          aVal = parseFloat(aVal.replace(/[^\d.-]/g, ''));
+          bVal = parseFloat(bVal.replace(/[^\d.-]/g, ''));
+        }
+        
+        return aVal > bVal ? 1 : -1;
+      });
+      
+      rows.forEach(row => tbody.appendChild(row));
+    }
+
+    // ==================== MAIN ====================
+    async function refreshAll() {
+      updateTimestamp();
+      await Promise.all([
+        loadOverview(),
+        loadMarketplace(),
+        loadLogs(),
+        loadSearches(),
+        loadFlagged()
+      ]);
+    }
+
+    function startAutoRefresh() {
+      refreshTimer = setInterval(refreshAll, REFRESH_INTERVAL);
+    }
+
+    function stopAutoRefresh() {
+      if (refreshTimer) clearInterval(refreshTimer);
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      initCharts();
+      refreshAll();
+      startAutoRefresh();
+      
+      // Handle visibility change
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          stopAutoRefresh();
+        } else {
+          refreshAll();
+          startAutoRefresh();
+        }
+      });
+    });
+
+    // Handle resize for sparkline
+    window.addEventListener('resize', () => {
+      renderSparkline(mockData.views.trend);
+    });
+  </script>
+</body>
+</html>
