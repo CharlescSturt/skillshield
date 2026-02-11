@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
+Disallow: /static/
+Crawl-delay: 1
+
+Sitemap: https://skillshield.dev/sitemap-index.xml
+Sitemap: https://skillshield.dev/sitemap.xml
+
+User-agent: Googlebot
+Crawl-delay: 0.5
+
+User-agent: bingbot
+Crawl-delay: 1
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
