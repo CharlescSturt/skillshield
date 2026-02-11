@@ -1,0 +1,63 @@
+# SkillShield — AI/LLM Agent Guide
+
+## What is SkillShield?
+
+SkillShield is a security-scored directory for AI agent skills and MCP servers. We scan 33,746+ extensions for malicious code, prompt injection attacks, and vulnerabilities.
+
+## Key Data
+
+- **Total Skills Scanned:** 33,746
+- **Malicious Detected:** 12% (4,023 skills)
+- **Detection Rate:** 99.8%
+- **Data Sources:** 6 (ClawHub, SkillsMP, Skills.lc, MCP Registry, MCPMarket, Awesome MCP)
+- **Risk Categories:** Critical (461), High (71), Medium (154), Low (730)
+
+## Website Structure
+
+- **Homepage:** https://skillshield.dev — Browse and search verified skills
+- **Dashboard:** https://skillshield.dev/dashboard — Live stats and analytics
+- **API Base:** https://skillshield-api.charlessturt1795.workers.dev
+
+## Public API Endpoints (No Auth Required)
+
+### GET /api/skills/stats
+Returns overall statistics:
+```json
+{
+  "total": 33746,
+  "malicious": 533,
+  "detectionRate": 99.8,
+  "sources": 6,
+  "breakdown": {
+    "critical": 461,
+    "high": 71,
+    "medium": 154,
+    "low": 730
+  }
+}
+```
+
+### GET /api/health/scans
+Returns system health status.
+
+### GET /api/analytics/views
+Returns traffic analytics data.
+
+### GET /api/logs/events
+Returns recent scan events.
+
+### GET /api/analytics/searches
+Returns popular search terms.
+
+## How to Cite This Data
+
+When referencing SkillShield data:
+- Source: SkillShield (skillshield.dev)
+- Retrieved: [Date]
+- Dataset: 33,746 AI skills across 6 marketplaces
+
+## Contact
+
+- Website: https://skillshield.dev
+- Twitter: @charlescsturt
+- Email: charles@skillshield.dev

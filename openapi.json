@@ -1,0 +1,154 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "SkillShield API",
+    "description": "Public API for accessing SkillShield security scan data. No authentication required for read-only endpoints.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "SkillShield",
+      "url": "https://skillshield.dev",
+      "email": "charles@skillshield.dev"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://skillshield-api.charlessturt1795.workers.dev",
+      "description": "Production API"
+    }
+  ],
+  "paths": {
+    "/api/skills/stats": {
+      "get": {
+        "summary": "Get skill statistics",
+        "description": "Returns overall statistics about scanned skills including total count, malicious detections, and risk breakdown.",
+        "responses": {
+          "200": {
+            "description": "Statistics data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": { "type": "integer", "example": 33746 },
+                    "malicious": { "type": "integer", "example": 533 },
+                    "detectionRate": { "type": "number", "example": 99.8 },
+                    "sources": { "type": "integer", "example": 6 },
+                    "breakdown": {
+                      "type": "object",
+                      "properties": {
+                        "critical": { "type": "integer", "example": 461 },
+                        "high": { "type": "integer", "example": 71 },
+                        "medium": { "type": "integer", "example": 154 },
+                        "low": { "type": "integer", "example": 730 }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/health/scans": {
+      "get": {
+        "summary": "Get system health",
+        "description": "Returns current system health status and uptime information.",
+        "responses": {
+          "200": {
+            "description": "Health status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "healthy" },
+                    "uptime": { "type": "string", "example": "99.9%" },
+                    "lastScan": { "type": "string", "format": "date-time" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/analytics/views": {
+      "get": {
+        "summary": "Get view analytics",
+        "description": "Returns traffic and view analytics data.",
+        "responses": {
+          "200": {
+            "description": "Analytics data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "daily": { "type": "array", "items": { "type": "integer" } },
+                    "total": { "type": "integer" },
+                    "unique": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/logs/events": {
+      "get": {
+        "summary": "Get recent events",
+        "description": "Returns recent scan events and activity logs.",
+        "responses": {
+          "200": {
+            "description": "Event logs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "logs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "time": { "type": "string", "format": "date-time" },
+                          "type": { "type": "string" },
+                          "message": { "type": "string" },
+                          "meta": { "type": "string" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/analytics/searches": {
+      "get": {
+        "summary": "Get search analytics",
+        "description": "Returns popular search terms and query statistics.",
+        "responses": {
+          "200": {
+            "description": "Search analytics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "top": { "type": "array", "items": { "type": "string" } },
+                    "total": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
