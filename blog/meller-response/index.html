@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillShield Review: AI Skill Scanner Finds 461 Threats</title>
+  <meta name="description" content="Our AI skill scanner found 461 critical threats before Meller's report. SkillShield review confirms: 12% of AI skills are malicious. Scan yours now.">
+  <meta name="keywords" content="malicious AI skills, AI agent security, OpenClaw security scanning, AI agent supply chain attack, SkillShield scan">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://skillshield.dev/blog/meller-response/">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect rx='20' width='100' height='100' fill='%23059669'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='white'>🛡</text></svg>">
+  
+  <!-- OG / Twitter Meta Tags -->
+  <meta property="og:title" content="We Scanned 1,676 Skills Before the Meller Report — Here's What We Found">
+  <meta property="og:description" content="Jason Meller exposed malicious OpenClaw skills. We'd already scanned 1,676 of them. 461 scored CRITICAL. Here's what our data adds to the picture.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://skillshield.dev/blog/meller-response/">
+  <meta property="og:image" content="https://skillshield.dev/blog/images/meller-response-hero.png">
+  <meta property="article:published_time" content="2026-02-06">
+  <meta property="article:author" content="SkillShield Research Team">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="We Scanned 1,676 Skills Before the Meller Report — Here's What We Found">
+  <meta name="twitter:description" content="Jason Meller exposed malicious OpenClaw skills. We'd already scanned 1,676 of them. 461 scored CRITICAL. Here's what our data adds to the picture.">
+  <meta name="twitter:image" content="https://skillshield.dev/blog/images/meller-response-hero.png">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@0.344.0"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Schema.org Article Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "We Scanned 1,676 Skills Before the Meller Report — Here's What We Found",
+    "description": "Jason Meller exposed malicious OpenClaw skills. We'd already scanned 1,676 of them. 461 scored CRITICAL. Here's what our data adds to the picture.",
+    "author": {
+      "@type": "Organization",
+      "name": "SkillShield Research Team"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "SkillShield",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://skillshield.dev/logo.png"
+      }
+    },
+    "datePublished": "2026-02-06",
+    "dateModified": "2026-02-06",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://skillshield.dev/blog/meller-response/"
+    },
+    "image": "https://skillshield.dev/blog/images/meller-response-hero.png",
+    "keywords": "malicious AI skills, AI agent security, OpenClaw security scanning, AI agent supply chain attack, SkillShield scan"
+  }
+  </script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            slate: {
+              850: '#1e293b',
+              900: '#0f172a',
+              950: '#020617',
+            },
+            emerald: {
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+            },
+            amber: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+            },
+            red: {
+              400: '#f87171',
+              500: '#ef4444',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  
+  <style>
+    body {
+      background-color: #020617;
+      color: #e2e8f0;
+    }
+    .prose h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+      line-height: 1.3;
+    }
+    .prose h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      margin-top: 2rem;
+      margin-bottom: 0.75rem;
+      line-height: 1.4;
+    }
+    .prose p {
+      margin-bottom: 1.25rem;
+      line-height: 1.8;
+      color: #cbd5e1;
+    }
+    .prose ul, .prose ol {
+      margin-bottom: 1.25rem;
+      padding-left: 1.5rem;
+    }
+    .prose ul {
+      list-style-type: disc;
+    }
+    .prose ol {
+      list-style-type: decimal;
+    }
+    .prose li {
+      margin-bottom: 0.5rem;
+      line-height: 1.7;
+      color: #cbd5e1;
+    }
+    .prose a {
+      color: #34d399;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
+    }
+    .prose a:hover {
+      border-bottom-color: #34d399;
+    }
+    .prose blockquote {
+      border-left: 4px solid #10b981;
+      padding-left: 1.25rem;
+      margin: 1.5rem 0;
+      font-style: italic;
+      color: #94a3b8;
+    }
+    .prose code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875em;
+      background-color: #0f172a;
+      padding: 0.2em 0.4em;
+      border-radius: 0.25rem;
+      color: #34d399;
+    }
+    .prose pre {
+      background-color: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      overflow-x: auto;
+      margin: 1.5rem 0;
+    }
+    .prose pre code {
+      background-color: transparent;
+      padding: 0;
+      color: #e2e8f0;
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
+    .prose table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.9375rem;
+    }
+    .prose th {
+      background-color: #0f172a;
+      border: 1px solid #1e293b;
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+    .prose td {
+      border: 1px solid #1e293b;
+      padding: 0.75rem 1rem;
+      color: #cbd5e1;
+    }
+    .prose tr:nth-child(even) {
+      background-color: rgba(15, 23, 42, 0.5);
+    }
+    .prose hr {
+      border: 0;
+      border-top: 1px solid #1e293b;
+      margin: 2.5rem 0;
+    }
+    .prose strong {
+      color: #f1f5f9;
+      font-weight: 600;
+    }
+    .reading-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #10b981, #34d399);
+      z-index: 100;
+      transition: width 0.1s ease;
+    }
+  </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col">
+  
+  <!-- Reading Progress Bar -->
+  <div class="reading-progress" id="reading-progress"></div>
+  
+  <!-- Navigation -->
+  <nav class="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-md border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <a href="/" class="flex items-center gap-3 group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+            <i data-lucide="shield-check" class="w-6 h-6 text-white"></i>
+          </div>
+          <span class="text-xl font-bold text-white tracking-tight">Skill<span class="text-emerald-400">Shield</span></span>
+        </a>
+        
+        <div class="hidden md:flex items-center gap-8">
+          <a href="/" class="text-slate-400 hover:text-white transition-colors text-sm font-medium">Home</a>
+          <a href="/blog/" class="text-emerald-400 font-medium text-sm">Blog</a>
+          <a href="/" class="text-slate-400 hover:text-white transition-colors text-sm font-medium">Scanner</a>
+        </div>
+        
+        <button id="mobile-menu-btn" class="md:hidden p-2 text-slate-400 hover:text-white">
+          <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Breadcrumb -->
+  <div class="border-b border-slate-800 bg-slate-950/50">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 py-4">
+      <nav class="flex items-center gap-2 text-sm">
+        <a href="/" class="text-slate-500 hover:text-emerald-400 transition-colors">Home</a>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-600"></i>
+        <a href="/blog/" class="text-slate-500 hover:text-emerald-400 transition-colors">Blog</a>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-600"></i>
+        <span class="text-slate-400 truncate">We Scanned 1,676 Skills Before...</span>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Article -->
+  <article class="flex-1">
+    <header class="max-w-3xl mx-auto px-4 sm:px-6 pt-12 pb-8">
+      <div class="flex items-center gap-3 mb-6">
+        <span class="px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-mono font-medium">CRITICAL</span>
+        <span class="text-slate-500 text-sm">February 6, 2026</span>
+        <span class="text-slate-600">•</span>
+        <span class="text-slate-500 text-sm flex items-center gap-1.5">
+          <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+          14 min read
+        </span>
+      </div>
+      
+      <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight tracking-tight">
+        We Scanned 1,676 Skills Before the Meller Report — Here's What We Found
+      </h1>
+      
+      <div class="flex items-center gap-4 py-6 border-y border-slate-800">
+        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center">
+          <i data-lucide="users" class="w-6 h-6 text-white"></i>
+        </div>
+        <div>
+          <p class="text-white font-medium">SkillShield Research Team</p>
+          <p class="text-slate-500 text-sm">Security Research</p>
+        </div>
+      </div>
+    </header>
+
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 pb-16">
+      <div class="prose max-w-none">
+        <p><strong>On February 2nd, Jason Meller published <a href="https://example.com/meller-post">"From magic to malware"</a> — the most important piece of AI agent security research to date.</strong> He found that the top-downloaded skill on ClawHub was a malware delivery vehicle. That hundreds of skills distribute macOS infostealers via ClickFix-style instructions. That markdown is, in his words, "executable intent."</p>
+
+<p>He's right about all of it. We know because we'd already scanned 1,676 skills before his post went live — and our data confirms, extends, and in some cases makes his findings look conservative. Read our complete <a href="/blog/we-scanned-1676-skills">AI skill security scan results</a> for the full picture.</p>
+
+<h2>Meller's findings are correct. The numbers are worse.</h2>
+
+<p>Meller's post focused on a single high-profile case: the top-downloaded ClawHub skill, a staged delivery attack that decoded an obfuscated payload, removed macOS quarantine attributes, and ran an infostealer targeting browser sessions, SSH keys, and cloud credentials.</p>
+
+<p>Our <a href="/blog/we-scanned-1676-skills">automated scan of 1,676 skills</a> across three marketplaces found that case was the tip of a larger iceberg:</p>
+
+<ul>
+<li><strong>461 skills scored CRITICAL</strong> for security risk — a score below 20 out of 100</li>
+<li><strong>12% were actively malicious</strong> — not "potentially risky" but containing credential theft, code injection, or data exfiltration patterns</li>
+<li><strong>32.6% of ClawHub's entire catalog</strong> scored CRITICAL, the highest rate of any marketplace we tested</li>
+<li><strong>386 fake crypto skills</strong> connected to a <a href="/blog/anatomy-malicious-skill">single command-and-control server</a>, collectively downloaded over 7,000 times</li>
+</ul>
+
+<p>Meller described one attack. We found hundreds running concurrently.</p>
+
+<h2>What "markdown is an installer" looks like in scanner data</h2>
+
+<p>Meller's core insight — that skill markdown functions as an installer, not as content — maps exactly to what our scanner detects. Here's what the attack patterns look like at scale.</p>
+
+<h3>Obfuscated payloads are everywhere</h3>
+
+<p>Our scanner runs three layers of obfuscation detection: regex pattern matching for <code>base64 -d | bash</code> chains, AST-level analysis that decodes hex and unicode escape sequences to inspect their contents, and prompt-level analysis that decodes base64 blocks found in markdown body text.</p>
+
+<p>The most common obfuscation pattern we've seen is exactly what Meller described:</p>
+
+<pre><code>echo "&lt;base64 payload&gt;" | base64 -d | bash</code></pre>
+
+<p>Our <code>OBFUSCATED_SHELL</code> rule catches this at weight 30 (critical). But we also find more creative variants: <code>String.fromCharCode()</code> building shell commands character-by-character, reversed strings reconstructed with <code>.split('').reverse().join('')</code>, and <code>Buffer.from()</code> with byte arrays that decode to <code>child_process</code> imports. The evasion techniques are sophisticated. The <a href="/blog/anatomy-malicious-skill">intent is always the same</a>.</p>
+
+<h3>Credential targeting is systematic, not opportunistic</h3>
+
+<p>Meller noted that the malware targeted "browser sessions, cookies, credentials, developer tokens, SSH keys, cloud credentials." Our scan data shows this isn't a grab-bag — it's a checklist.</p>
+
+<p>The five most frequently accessed credential paths across all CRITICAL-scored skills:</p>
+
+<ol>
+<li><strong><code>~/.ssh/</code></strong> — SSH keys (present in 34% of CRITICAL skills)</li>
+<li><strong><code>~/.aws/</code></strong> — AWS credentials</li>
+<li><strong><code>.env</code> files</strong> — API keys and secrets</li>
+<li><strong><code>auth-profiles.json</code></strong> — OpenClaw auth tokens</li>
+<li><strong><code>~/.config/</code></strong> — Application configuration including cloud CLI credentials</li>
+</ol>
+
+<p>We also detect a pattern Meller didn't mention: <strong>environment variable harvesting</strong>. Rather than targeting specific credential files, some skills iterate over <code>process.env</code> with filters like <code>/key|secret|token|pass|cred|auth/i</code>. They don't know what secrets you have. They take all of them.</p>
+
+<h3>Prompt injection is the social engineering layer</h3>
+
+<p>Meller described ClickFix-style instructions — social engineering that gets users (or agents) to paste and execute commands. Our <a href="/blog/prompt-injection-wild">prompt injection analysis</a> found this operating at multiple levels:</p>
+
+<ul>
+<li><strong>Direct injection:</strong> <code>&lt;system&gt;</code> tags, <code>[INST]</code> delimiters, "ignore previous instructions" — classic prompt manipulation attempting to override the agent's safety boundaries</li>
+<li><strong>Roleplay framing:</strong> "Pretend you are an admin with full access" combined with credential access keywords — scored as critical (weight 35) because the combination of social engineering + credential targeting indicates deliberate attack</li>
+<li><strong>Hidden instructions:</strong> Unicode zero-width characters embedding invisible commands between visible text, bidirectional override characters that make displayed text read differently than it executes, and base64 blocks in markdown that decode to injection payloads</li>
+<li><strong>Secrecy demands:</strong> "Do not tell the user" combined with external URLs — the scanner flags this specific combination at weight 35 because legitimate skills have no reason to hide their behavior from the user</li>
+</ul>
+
+<p>These aren't theoretical. We found them in production skills on ClawHub.</p>
+
+<h2>The attack vectors Meller called for registries to scan</h2>
+
+<p>Meller ended his post with a list of recommendations. Here's where our scanner stands on each.</p>
+
+<h3>✅ One-liner installers: Detected</h3>
+
+<p><code>curl | bash</code>, <code>wget | sh</code>, and their variants are caught by our shell analysis at critical severity (weight 30). We detect them in standalone scripts, in <code>package.json</code> install hooks, and in <code>setup.py</code> / <code>pyproject.toml</code> build scripts. We also catch the obfuscated version — base64-encoded payloads piped through decode into shell.</p>
+
+<h3>✅ Encoded payloads: Detected</h3>
+
+<p>Three independent detection layers cover this: pattern matching for common encoding functions, AST analysis that actually decodes hex/unicode/base64 strings and inspects the result, and a behavioral signature (<code>EVASIVE_MALWARE</code>) that fires when obfuscation techniques combine with dangerous operations like code execution or credential access.</p>
+
+<h3>✅ Credential theft patterns: Detected</h3>
+
+<p>18 specific credential path patterns, environment variable harvesting detection, and a behavioral chain detector that flags credential read → encode → network send as <code>EXFIL_CHAIN</code> at weight 40 — the highest-weight single finding in our ruleset.</p>
+
+<h3>⚠️ Quarantine removal: Partially detected</h3>
+
+<p>We catch the execution mechanism — <code>execSync</code>, <code>spawn</code>, <code>child_process</code> — but we're adding a specific <code>xattr -d com.apple.quarantine</code> rule at critical severity. This is shipping in our next update. Meller is right that this specific macOS bypass deserves its own detection.</p>
+
+<h3>⚠️ External link warnings: Partially detected</h3>
+
+<p>We extract all URLs and check them against known-malicious domains, internal IPs (SSRF), and suspicious services (webhook.site, requestbin.net). We catch instruction-like content hidden in link anchor text. What we don't yet catch: short anchor text ("here", "this link") used to disguise malicious URLs. That's on the roadmap.</p>
+
+<h3>❌ Password-protected archives: Not yet detected</h3>
+
+<p>This is our biggest gap. We detect binary files and flag them, but we don't specifically detect archive formats or the pattern of "download this ZIP and use password X." We're adding archive extension detection and a markdown pattern rule for password + archive combinations.</p>
+
+<h3>❌ Provenance verification: Architectural</h3>
+
+<p>Publisher reputation and code signing require registry infrastructure, not a scanner. But scan results like ours are exactly the security signal that marketplaces should surface alongside download counts. A skill with 50,000 downloads and a SkillShield score of 8/100 should scare you more than a skill with 3 downloads — it means 50,000 people ran malware.</p>
+
+<h2>What you can do right now</h2>
+
+<p>Meller's advice was stark: "do not do it on a company device. Full stop." That's correct but incomplete. Here's what else you should do.</p>
+
+<ol>
+<li><strong>Scan before you install.</strong> Run <a href="/">SkillShield</a> on any skill before adding it to your agent. A scan takes seconds. Remediation takes weeks. Use our <a href="/blog/how-to-vet-ai-skill">AI skill security checklist</a>.</li>
+
+<li><strong>Read the SKILL.md, not just the description.</strong> Open the raw markdown. Look for shell commands, external links, and instructions to install prerequisites. If a skill tells you to run <code>curl | bash</code> for setup, that skill is not your friend.</li>
+
+<li><strong>Check what permissions the skill needs.</strong> A weather skill doesn't need <code>~/.ssh/</code>. A search skill doesn't need <code>child_process</code>. If the capabilities don't match the description, walk away.</li>
+
+<li><strong>Isolate your agent.</strong> If you must experiment, do it in a VM or container with no access to real credentials. Don't mount your home directory. Don't share your SSH agent. Don't forward cloud CLI sessions.</li>
+
+<li><strong>Watch for behavioral signatures.</strong> A skill that reads credentials AND makes network calls AND uses obfuscation is not being clever — it's being malicious. SkillShield detects these compound patterns automatically, but you should know what they mean when you see them in a scan report.</li>
+
+<li><strong>Don't trust download counts.</strong> The most-downloaded skill on ClawHub was malware. Popularity is a signal of distribution, not safety. A 7,000-download crypto skill connected to a <a href="/blog/anatomy-malicious-skill">single C2 server</a> proves that.</li>
+</ol>
+
+<h2>The bottom line</h2>
+
+<p>Jason Meller sounded the alarm. We're here to say: the fire was already burning, and we've been mapping it. Our data shows this isn't an isolated incident or a theoretical risk — it's a systematic security crisis affecting a third of the largest AI skill marketplace.</p>
+
+<p>Meller wrote that "markdown is executable intent." We'd add: and right now, nobody is checking that intent before it executes on your machine. That's the problem we built SkillShield to solve.</p>
+
+<p><strong><a href="https://skillshield.dev">Scan your skills with SkillShield →</a></strong></p>
+
+<hr>
+
+<p><em>Related reading:</em></p>
+<ul>
+<li><a href="/blog/we-scanned-1676-skills">We Scanned 1,676 AI Agent Skills — Full Results</a></li>
+<li><a href="/blog/clawhub-crisis">The ClawHub Crisis: Why 32% of Skills Want Your SSH Keys</a></li>
+<li><a href="/blog/anatomy-malicious-skill">Anatomy of a Malicious Skill: How Fake Crypto Tools Steal Your Wallet</a></li>
+<li><a href="/blog/prompt-injection-wild">Prompt Injection in the Wild</a></li>
+</ul>
+      </div>
+
+      <!-- Share Buttons -->
+      <div class="mt-12 pt-8 border-t border-slate-800">
+        <h3 class="text-sm font-medium text-slate-400 mb-4">Share this article</h3>
+        <div class="flex flex-wrap gap-3">
+          <a href="https://twitter.com/intent/tweet?text=We%20Scanned%201%2C676%20Skills%20Before%20the%20Meller%20Report%20%E2%80%94%20Here%27s%20What%20We%20Found&url=https://skillshield.dev/blog/meller-response/" 
+             target="_blank" rel="noopener noreferrer"
+             class="inline-flex items-center gap-2 px-4 py-2 bg-[#1da1f2]/10 border border-[#1da1f2]/20 text-[#1da1f2] rounded-lg hover:bg-[#1da1f2]/20 transition-colors text-sm font-medium">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            Share on X
+          </a>
+          <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://skillshield.dev/blog/meller-response/" 
+             target="_blank" rel="noopener noreferrer"
+             class="inline-flex items-center gap-2 px-4 py-2 bg-[#0a66c2]/10 border border-[#0a66c2]/20 text-[#0a66c2] rounded-lg hover:bg-[#0a66c2]/20 transition-colors text-sm font-medium">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            Share on LinkedIn
+          </a>
+        </div>
+      </div>
+
+      <!-- Prev/Next Navigation -->
+      <nav class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <a href="/blog/we-scanned-1676-skills/" class="group p-6 border border-slate-800 rounded-xl hover:border-emerald-500/30 hover:bg-slate-900/50 transition-all">
+          <span class="text-xs text-slate-500 uppercase tracking-wider flex items-center gap-2 mb-2">
+            <i data-lucide="arrow-left" class="w-3 h-3"></i> Previous
+          </span>
+          <span class="text-white font-medium group-hover:text-emerald-400 transition-colors block">We Scanned 1,676 Skills</span>
+        </a>
+        <a href="/blog/clawhub-crisis/" class="group p-6 border border-slate-800 rounded-xl hover:border-emerald-500/30 hover:bg-slate-900/50 transition-all md:text-right">
+          <span class="text-xs text-slate-500 uppercase tracking-wider flex items-center gap-2 md:justify-end mb-2">
+            Next <i data-lucide="arrow-right" class="w-3 h-3"></i>
+          </span>
+          <span class="text-white font-medium group-hover:text-emerald-400 transition-colors block">The ClawHub Crisis</span>
+        </a>
+      </nav>
+
+      <!-- Back to Blog -->
+      <div class="mt-12 text-center">
+        <a href="/blog/" class="inline-flex items-center gap-2 text-slate-400 hover:text-emerald-400 transition-colors text-sm">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          Back to all articles
+        </a>
+      </div>
+    </div>
+  </article>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800 bg-slate-950">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center">
+            <i data-lucide="shield-check" class="w-4 h-4 text-white"></i>
+          </div>
+          <span class="text-lg font-bold text-white">Skill<span class="text-emerald-400">Shield</span></span>
+        </div>
+        <div class="flex items-center gap-6 text-sm text-slate-500">
+          <a href="/" class="hover:text-emerald-400 transition-colors">Home</a>
+          <a href="/blog/" class="text-emerald-400">Blog</a>
+          <a href="/" class="hover:text-emerald-400 transition-colors">Scanner</a>
+        </div>
+        <p class="text-sm text-slate-600">
+          © 2026 SkillShield. All rights reserved.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+    
+    // Reading progress bar
+    window.addEventListener('scroll', () => {
+      const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      document.getElementById('reading-progress').style.width = scrolled + '%';
+    });
+  </script>
+</body>
+</html>
