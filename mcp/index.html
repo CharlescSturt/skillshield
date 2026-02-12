@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCP Security Scanner — SkillShield</title>
+  <meta name="description" content="The first security scanner for MCP servers. Detect tool poisoning, over-permissioned access, and prompt injection vulnerabilities.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .gradient-text {
+      background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .risk-critical { background: #ef4444; }
+    .risk-high { background: #f59e0b; }
+    .risk-medium { background: #eab308; }
+    .risk-low { background: #10b981; }
+  </style>
+</head>
+<body class="bg-slate-900 text-white min-h-screen">
+  <!-- Navigation -->
+  <nav class="border-b border-slate-800">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2">
+        <div class="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+        </div>
+        <span class="font-semibold">SkillShield</span>
+        <span class="text-slate-400">/</span>
+        <span class="text-emerald-400">MCP Scanner</span>
+      </a>
+      <div class="flex gap-4">
+        <a href="/" class="text-slate-400 hover:text-white transition">← Back to SkillShield</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="py-20 px-4">
+    <div class="max-w-4xl mx-auto text-center">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm mb-6">
+        <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+        First MCP-specific security scanner
+      </div>
+      <h1 class="text-5xl font-bold mb-6">
+        Secure Your <span class="gradient-text">MCP Servers</span>
+      </h1>
+      <p class="text-xl text-slate-400 mb-8 max-w-2xl mx-auto">
+        Detect tool poisoning, over-permissioned access, prompt injection vectors, and supply chain risks in Model Context Protocol servers.
+      </p>
+      
+      <!-- Scan Form -->
+      <div class="max-w-xl mx-auto bg-slate-800 rounded-xl p-2 border border-slate-700">
+        <div class="flex gap-2">
+          <input 
+            type="text" 
+            id="repoInput"
+            placeholder="github:owner/repo (e.g., github:modelcontextprotocol/server-filesystem)"
+            class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+          >
+          <button 
+            onclick="scanRepo()"
+            id="scanBtn"
+            class="bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-6 py-3 rounded-lg transition flex items-center gap-2"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            Scan
+          </button>
+        </div>
+      </div>
+      
+      <p class="text-slate-500 text-sm mt-4">
+        Free security analysis · No signup required · Results in seconds
+      </p>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="py-12 border-y border-slate-800">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="grid md:grid-cols-3 gap-8 text-center">
+        <div>
+          <div class="text-4xl font-bold text-emerald-400 mb-2">1,000+</div>
+          <div class="text-slate-400">Exposed MCP servers detected</div>
+        </div>
+        <div>
+          <div class="text-4xl font-bold text-red-400 mb-2">RCE</div>
+          <div class="text-slate-400">Found in official Anthropic server</div>
+        </div>
+        <div>
+          <div class="text-4xl font-bold text-amber-400 mb-2">Tool Poisoning</div>
+          <div class="text-slate-400">#1 attack vector in MCP</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What We Detect -->
+  <section class="py-20 px-4">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="text-3xl font-bold text-center mb-12">What We Detect</h2>
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+          <div class="w-12 h-12 bg-red-500/10 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+          </div>
+          <h3 class="font-semibold mb-2">Tool Poisoning</h3>
+          <p class="text-slate-400 text-sm">Malicious instructions hidden in tool descriptions that trick LLMs into harmful actions.</p>
+        </div>
+        
+        <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+          <div class="w-12 h-12 bg-amber-500/10 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+          </div>
+          <h3 class="font-semibold mb-2">Over-Permissioned</h3>
+          <p class="text-slate-400 text-sm">Servers requesting full filesystem, network, or command execution access without justification.</p>
+        </div>
+        
+        <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+          <div class="w-12 h-12 bg-purple-500/10 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <h3 class="font-semibold mb-2">Prompt Injection</h3>
+          <p class="text-slate-400 text-sm">Vulnerabilities allowing attackers to override instructions via crafted tool inputs.</p>
+        </div>
+        
+        <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+          <div class="w-12 h-12 bg-cyan-500/10 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+            </svg>
+          </div>
+          <h3 class="font-semibold mb-2">Supply Chain</h3>
+          <p class="text-slate-400 text-sm">Dependency risks, typosquatting, and compromised packages in the MCP ecosystem.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Results Section (Hidden by default) -->
+  <section id="resultsSection" class="py-12 px-4 hidden">
+    <div class="max-w-4xl mx-auto">
+      <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
+        <!-- Header -->
+        <div class="p-6 border-b border-slate-700">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-2xl font-bold mb-1">Scan Results</h2>
+              <p id="scanTarget" class="text-slate-400"></p>
+            </div>
+            <div id="scoreBadge" class="text-center">
+              <div id="scoreValue" class="text-5xl font-bold"></div>
+              <div class="text-sm text-slate-400">Security Score</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Findings -->
+        <div id="findingsList" class="divide-y divide-slate-700">
+          <!-- Findings injected here -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Scans -->
+  <section class="py-20 px-4 border-t border-slate-800">
+    <div class="max-w-4xl mx-auto">
+      <h2 class="text-2xl font-bold mb-6">Recent Scans</h2>
+      <div id="recentScans" class="space-y-3">
+        <div class="text-slate-500">Loading...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800 py-12 px-4">
+    <div class="max-w-6xl mx-auto text-center text-slate-500">
+      <p>Part of <a href="/" class="text-emerald-400 hover:underline">SkillShield</a> — Security for AI agents</p>
+      <p class="mt-2 text-sm">Built because we got paranoid about MCP security</p>
+    </div>
+  </footer>
+
+  <script>
+    const API_BASE = 'https://skillshield-mcp-scanner.charlessturt1795.workers.dev';
+
+    async function scanRepo() {
+      const input = document.getElementById('repoInput');
+      const btn = document.getElementById('scanBtn');
+      const source = input.value.trim();
+      
+      if (!source || !source.startsWith('github:')) {
+        alert('Please enter a GitHub repo in format: github:owner/repo');
+        return;
+      }
+      
+      btn.disabled = true;
+      btn.innerHTML = '<svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Scanning...';
+      
+      try {
+        const response = await fetch(`${API_BASE}/api/mcp/scan`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ source })
+        });
+        
+        const result = await response.json();
+        
+        if (result.error) {
+          alert('Error: ' + result.error);
+          return;
+        }
+        
+        displayResults(result);
+        loadRecentScans();
+        
+      } catch (error) {
+        alert('Scan failed: ' + error.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Scan';
+      }
+    }
+
+    function displayResults(result) {
+      const section = document.getElementById('resultsSection');
+      const targetEl = document.getElementById('scanTarget');
+      const scoreEl = document.getElementById('scoreValue');
+      const findingsEl = document.getElementById('findingsList');
+      
+      section.classList.remove('hidden');
+      targetEl.textContent = `${result.owner}/${result.repo}`;
+      scoreEl.textContent = result.score;
+      
+      // Color code score
+      scoreEl.className = 'text-5xl font-bold ' + (
+        result.score >= 80 ? 'text-emerald-400' :
+        result.score >= 60 ? 'text-amber-400' :
+        result.score >= 40 ? 'text-orange-400' : 'text-red-400'
+      );
+      
+      // Scroll to results
+      section.scrollIntoView({ behavior: 'smooth' });
+      
+      // Render findings
+      if (result.findings.length === 0) {
+        findingsEl.innerHTML = `
+          <div class="p-8 text-center">
+            <div class="text-emerald-400 text-5xl mb-4">✓</div>
+            <h3 class="text-xl font-semibold mb-2">No issues found!</h3>
+            <p class="text-slate-400">This MCP server passed all security checks.</p>
+          </div>
+        `;
+      } else {
+        findingsEl.innerHTML = result.findings.map(f => `
+          <div class="p-6">
+            <div class="flex items-start gap-4">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                f.severity === 'CRITICAL' ? 'bg-red-500/20 text-red-400' :
+                f.severity === 'HIGH' ? 'bg-orange-500/20 text-orange-400' :
+                f.severity === 'MEDIUM' ? 'bg-amber-500/20 text-amber-400' :
+                'bg-blue-500/20 text-blue-400'
+              }">${f.severity}</span>
+              <div class="flex-1">
+                <h4 class="font-semibold mb-1">${f.title}</h4>
+                <p class="text-slate-400 text-sm mb-2">${f.description}</p>
+                ${f.evidence ? `<code class="block bg-slate-900 rounded p-2 text-xs text-slate-300 mb-2">${f.evidence}</code>` : ''}
+                <div class="text-sm">
+                  <span class="text-emerald-400">Fix:</span>
+                  <span class="text-slate-400">${f.remediation}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    async function loadRecentScans() {
+      try {
+        const response = await fetch(`${API_BASE}/api/mcp/recent`);
+        const scans = await response.json();
+        
+        const container = document.getElementById('recentScans');
+        if (scans.length === 0) {
+          container.innerHTML = '<div class="text-slate-500">No scans yet. Be the first!</div>';
+          return;
+        }
+        
+        container.innerHTML = scans.slice(0, 5).map(s => `
+          <div class="flex items-center justify-between bg-slate-800 rounded-lg p-4 border border-slate-700">
+            <div>
+              <div class="font-medium">${s.owner}/${s.repo}</div>
+              <div class="text-sm text-slate-500">${new Date(s.scannedAt).toLocaleDateString()}</div>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="text-2xl font-bold ${
+                s.score >= 80 ? 'text-emerald-400' :
+                s.score >= 60 ? 'text-amber-400' :
+                s.score >= 40 ? 'text-orange-400' : 'text-red-400'
+              }">${s.score}</span>
+              <span class="text-xs px-2 py-1 rounded ${
+                s.risk === 'LOW' ? 'bg-emerald-500/20 text-emerald-400' :
+                s.risk === 'MEDIUM' ? 'bg-amber-500/20 text-amber-400' :
+                s.risk === 'HIGH' ? 'bg-orange-500/20 text-orange-400' :
+                'bg-red-500/20 text-red-400'
+              }">${s.risk}</span>
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Failed to load recent scans:', error);
+      }
+    }
+
+    // Load recent scans on page load
+    loadRecentScans();
+    
+    // Allow Enter key to submit
+    document.getElementById('repoInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') scanRepo();
+    });
+  </script>
+</body>
+</html>

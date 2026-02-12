@@ -1,0 +1,7 @@
+name = "skillshield-mcp-scanner"
+main = "mcp-scanner-worker.js"
+compatibility_date = "2024-01-01"
+
+[[env.production.kv_namespaces]]
+binding = "MCP_SCANS"
+id = "mcp-scans-kv"
